@@ -36,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
 
         final ListView lv = (ListView) findViewById(R.id.notesList);
 
-        String username = "test";
-        String password = "m";
-        new PostAsync().execute(username, password);
-
+        //String username = "test";
+        //String password = "meow";
+       // new userLogin().execute(username, password);
+        //new getNotes().execute();
 
 
         String[] noteTitle = new String[]{
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    class PostAsync extends AsyncTask<String, String, JSONObject> {
+    class userLogin extends AsyncTask<String, String, JSONObject> {
         JSONParser jsonParser = new JSONParser();
 
         private ProgressDialog pDialog;
@@ -165,13 +165,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    class GetAsync extends AsyncTask<String, String, JSONObject> {
+    class getNotes extends AsyncTask<String, String, JSONObject> {
 
         JSONParser jsonParser = new JSONParser();
 
         private ProgressDialog pDialog;
 
-        private static final String LOGIN_URL = "http://rohanharrison.com/message/androidLogin.php";
+        private static final String LOGIN_URL = "http://rohanharrison.com/message/androidNotes.php";
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             pDialog = new ProgressDialog(MainActivity.this);
-            pDialog.setMessage("Attempting login...");
+            pDialog.setMessage("Fetching Notes...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
@@ -191,8 +191,8 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 HashMap<String, String> params = new HashMap<>();
-                params.put("name", args[0]);
-                params.put("password", args[1]);
+                //params.put("name", args[0]);
+                //params.put("password", args[1]);
 
                 Log.d("request", "starting");
 
