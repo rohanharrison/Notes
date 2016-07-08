@@ -35,6 +35,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -64,11 +66,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+
+        int userLength = SaveSharedPreference.getUserName(LoginActivity.this).length();
+
+        if(userLength <= 3)
+        {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_login);
+        }
+        else
+        {
+            String email = SaveSharedPreference.getUserName(LoginActivity.this);
+            String password = SaveSharedPreference.getPassword(LoginActivity.this);
+            new userLogin().execute(email, password);
+        }
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -190,12 +205,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // form field with an error.
             focusView.requestFocus();
         } else {
+
+
+
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
             //mAuthTask = new UserLoginTask(email, password);
-            mAuthTask = (userLogin) new userLogin().execute(email, password);
+            //mAuthTask = (userLogin) new userLogin().execute(email, password);
             //mAuthTask.execute((Void) null);
+
+                mAuthTask = (userLogin) new userLogin().execute(email, password);
+
+
         }
     }
 
@@ -238,6 +260,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -253,11 +276,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        return email.length() > 1;
+        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(email);
+        boolean b = m.find();
+
+        if (!b) {
+            return email.length() > 3;
+        }
+        return false;
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 1;
+        return password.length() > 3;
     }
 
     /**
@@ -351,6 +381,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     class userLogin extends AsyncTask<String, String, Boolean> {
+
         JSONParser jsonParser = new JSONParser();
 
         private ProgressDialog pDialog;
@@ -359,6 +390,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
+        private static final String TAG_USERNAME = "name";
+        private static final String TAG_PASSWORD = "password";
+
 
 
         @Override
@@ -373,6 +407,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(String... args) {
 
+
             final AutoCompleteTextView loginInput = (AutoCompleteTextView) findViewById(R.id.email);
             String message = "";
             try {
@@ -386,8 +421,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 JSONObject json = jsonParser.makeHttpRequest(
                         LOGIN_URL, "POST", params);
 
+
                 if (json.getInt(TAG_SUCCESS) == 1) {
                     Log.d("JSON result", json.toString());
+                    new SaveSharedPreference().setUserName(LoginActivity.this, json.getString(TAG_USERNAME));
+                    new SaveSharedPreference().setPassword(LoginActivity.this, json.getString(TAG_PASSWORD));
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     return true;

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.rohanharrison.notes.MainActivity">
     <item
-        android:id="@+id/action_favorite"
+        android:id="@+id/action_save"
         android:icon="@drawable/ic_save_white_48dp"
         android:title="Save"
         app:showAsAction="ifRoom"/>
