@@ -43,7 +43,9 @@ public class Body extends AppCompatActivity {
             String content = mText.getText().toString();
             String title = mText.getText().toString();
 
-           mPostNoteTask = (postNote) new postNote().execute(title, content);
+            String email = SaveSharedPreference.getUserName(Body.this);
+
+           mPostNoteTask = (postNote) new postNote().execute(email, content);
         }
 
         return super.onOptionsItemSelected(item);
@@ -54,7 +56,7 @@ public class Body extends AppCompatActivity {
 
         private ProgressDialog pDialog;
 
-        private static final String LOGIN_URL = "http://rohanharrison.com/message/androidPostNote.php";
+        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidPostNote.php";
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
@@ -72,7 +74,7 @@ public class Body extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(String... args) {
 
-            String name = SaveSharedPreference.getUserName(Body.this);
+            //String name = SaveSharedPreference.getUserName(Body.this);
 
             final AutoCompleteTextView loginInput = (AutoCompleteTextView) findViewById(R.id.email);
             String message = "";
@@ -80,7 +82,11 @@ public class Body extends AppCompatActivity {
 
                 HashMap<String, String> params = new HashMap<>();
                 //params.put(name, args[0]);
-                params.put("title", args[0]);
+                if (args[0].length() > 0) {
+                    params.put("name", args[0]);
+                } else {
+                    params.put("name", "null");
+                }
                 params.put("body", args[1]);
 
                 Log.d("request", "starting");

@@ -54,9 +54,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-   // private UserLoginTask mAuthTask = null;
-      private userLogin mAuthTask = null;
-      private userSignUp mAuthTaskSignUp = null;
+    // private UserLoginTask mAuthTask = null;
+    private userLogin mAuthTask = null;
+    private userSignUp mAuthTaskSignUp = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -69,17 +69,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         int userLength = SaveSharedPreference.getUserName(LoginActivity.this).length();
 
-        if(userLength <= 3)
-        {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_login);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        if (userLength > 3) {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+
         }
-        else
-        {
-            String email = SaveSharedPreference.getUserName(LoginActivity.this);
-            String password = SaveSharedPreference.getPassword(LoginActivity.this);
-            new userLogin().execute(email, password);
-        }
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -207,7 +205,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
 
 
-
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
@@ -215,7 +212,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //mAuthTask = (userLogin) new userLogin().execute(email, password);
             //mAuthTask.execute((Void) null);
 
-                mAuthTask = (userLogin) new userLogin().execute(email, password);
+            mAuthTask = (userLogin) new userLogin().execute(email, password);
 
 
         }
@@ -386,13 +383,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private ProgressDialog pDialog;
 
-        private static final String LOGIN_URL = "http://rohanharrison.com/message/androidLogin.php";
+        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidLogin.php";
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
         private static final String TAG_USERNAME = "name";
         private static final String TAG_PASSWORD = "password";
-
 
 
         @Override
@@ -448,10 +444,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private ProgressDialog pDialog;
 
-        private static final String LOGIN_URL = "http://rohanharrison.com/message/androidSignUp.php";
+        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidSignUp.php";
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
+        private static final String TAG_USERNAME = "name";
 
 
         @Override
@@ -481,6 +478,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 if (json.getInt(TAG_SUCCESS) == 1) {
                     Log.d("JSON result", json.toString());
+                    new SaveSharedPreference().setUserName(LoginActivity.this, args[0]);
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     return true;

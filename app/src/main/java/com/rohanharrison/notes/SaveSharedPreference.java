@@ -23,7 +23,7 @@ public class SaveSharedPreference
 
     public static void setPassword(Context ctx, String password) throws JSONException {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
-        editor.putString(PREF_PASSWORD, password.toString());
+        editor.putString(PREF_PASSWORD, password);
         editor.commit();
     }
 

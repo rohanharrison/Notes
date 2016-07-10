@@ -113,7 +113,7 @@ public class JSONParser {
                 result.append(line);
             }
 
-            Log.d("JSON Parser", "result: " + result.toString());
+           // Log.d("JSON Parser", "result: " + result.toString());
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -19,11 +19,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private getNotes mAuthTaskgetNotes = null;
 
 
     @Override
@@ -34,23 +35,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        final ListView lv = (ListView) findViewById(R.id.notesList);
-
-        //String username = "test";
-        //String password = "meow";
-       // new userLogin().execute(username, password);
-        //new getNotes().execute();
-
-
-        String[] noteTitle = new String[]{
-                "test",
-                "test2",
-                "test3"
-        };
-        final List<String> notes_list = new ArrayList<String>(Arrays.asList(noteTitle));
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, notes_list);
-        lv.setAdapter(arrayAdapter);
+        String email = SaveSharedPreference.getUserName(MainActivity.this);
+        String password = SaveSharedPreference.getPassword(MainActivity.this);
+        mAuthTaskgetNotes = (getNotes) new getNotes().execute(email, password);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -93,82 +80,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    class userLogin extends AsyncTask<String, String, JSONObject> {
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/message/androidLogin.php";
-
-        private static final String TAG_SUCCESS = "success";
-        private static final String TAG_MESSAGE = "message";
-
-
-        @Override
-        protected void onPreExecute() {
-            pDialog = new ProgressDialog(MainActivity.this);
-            pDialog.setMessage("Attempting login...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... args) {
-
-            try {
-
-                HashMap<String, String> params = new HashMap<>();
-                params.put("name", args[0]);
-                params.put("password", args[1]);
-
-                Log.d("request", "starting");
-
-                JSONObject json = jsonParser.makeHttpRequest(
-                        LOGIN_URL, "POST", params);
-
-                if (json != null) {
-                    Log.d("JSON result", json.toString());
-
-                    return json;
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        protected void onPostExecute(JSONObject json) {
-
-            int success = 0;
-            String message = "";
-
-            if (pDialog != null && pDialog.isShowing()) {
-                pDialog.dismiss();
-            }
-
-            if (json != null) {
-                Toast.makeText(MainActivity.this, json.toString(),
-                        Toast.LENGTH_LONG).show();
-
-                try {
-                    success = json.getInt(TAG_SUCCESS);
-                    message = json.optString(TAG_MESSAGE);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (success == 1) {
-                Log.d("Success!", message);
-            } else {
-                Log.d("Failure", message);
-            }
-        }
-
-    }
 
     class getNotes extends AsyncTask<String, String, JSONObject> {
 
@@ -176,10 +87,11 @@ public class MainActivity extends AppCompatActivity {
 
         private ProgressDialog pDialog;
 
-        private static final String LOGIN_URL = "http://rohanharrison.com/message/androidNotes.php";
+        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidGetNoteList.php";
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
+        private static final String TAG_TITLE = "title";
 
         @Override
         protected void onPreExecute() {
@@ -196,16 +108,19 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 HashMap<String, String> params = new HashMap<>();
-                //params.put("name", args[0]);
+                //params.put(SaveSharedPreference.getUserName(MainActivity.this), args[0]);
+                params.put("name", args[0]);
+                //params.put("title", args[1]);
                 //params.put("password", args[1]);
 
-                Log.d("request", "starting");
+              //  Log.d("request", "starting");
 
                 JSONObject json = jsonParser.makeHttpRequest(
                         LOGIN_URL, "GET", params);
 
+
                 if (json != null) {
-                    Log.d("JSON result", json.toString());
+                    //Log.d("JSON result", json.toString());
 
                     return json;
                 }
@@ -221,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
             int success = 0;
             String message = "";
+            ArrayList al = new ArrayList();
 
             if (pDialog != null && pDialog.isShowing()) {
                 pDialog.dismiss();
@@ -238,8 +154,27 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if (success == 1) {
-                Log.d("Success!", message);
+            if (json != null) {
+                //Log.d("Success!", message);
+
+
+                final ListView lv = (ListView) findViewById(R.id.notesList);
+
+                try {
+                    for (int i = 0; i < 24; i++) {
+                        String meow = json.getString(TAG_TITLE).toString();
+                        String[] parts = meow.split(",");
+                        al.add(parts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                final List<String> notes_list = new ArrayList<String>(al);
+                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String> (MainActivity.this, android.R.layout.simple_list_item_1, notes_list);
+                lv.setAdapter(arrayAdapter);
+
+
+
             } else {
                 Log.d("Failure", message);
             }
