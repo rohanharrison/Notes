@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -13,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,14 +23,30 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
     private getNotes mAuthTaskgetNotes = null;
-
+    ListView mListView;
+    private SwipeRefreshLayout mSwipeRefreshLayout = null;
+    ArrayList idarraylist = new ArrayList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        //Initialize swipe to refresh view
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                String email = SaveSharedPreference.getUserName(MainActivity.this);
+                String password = SaveSharedPreference.getPassword(MainActivity.this);
+                mAuthTaskgetNotes = (getNotes) new getNotes().execute(email, password);
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -46,12 +62,29 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, Body.class);
                 startActivity(intent);
-                // notes_list.add("test");
-                //arrayAdapter.notifyDataSetChanged();
             }
         });
     }
 
+
+
+    /*private void updateList() {
+        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+        startActivity(intent);
+
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    }*/
+
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -69,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+
         }
         if (id == R.id.action_signout) {
             SaveSharedPreference.clearUserName(MainActivity.this);
@@ -91,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
+        private static final String TAG_ID = "id";
         private static final String TAG_TITLE = "title";
 
         @Override
@@ -113,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 //params.put("title", args[1]);
                 //params.put("password", args[1]);
 
-              //  Log.d("request", "starting");
+                //  Log.d("request", "starting");
 
                 JSONObject json = jsonParser.makeHttpRequest(
                         LOGIN_URL, "GET", params);
@@ -138,13 +172,15 @@ public class MainActivity extends AppCompatActivity {
             String message = "";
             ArrayList al = new ArrayList();
 
+
+
             if (pDialog != null && pDialog.isShowing()) {
                 pDialog.dismiss();
             }
 
             if (json != null) {
-                Toast.makeText(MainActivity.this, json.toString(),
-                        Toast.LENGTH_LONG).show();
+                //Toast.makeText(MainActivity.this, json.toString(),
+                        //Toast.LENGTH_LONG).show();
 
                 try {
                     success = json.getInt(TAG_SUCCESS);
@@ -160,19 +196,25 @@ public class MainActivity extends AppCompatActivity {
 
                 final ListView lv = (ListView) findViewById(R.id.notesList);
 
+                int notesToLoad = 24;
+
                 try {
-                    for (int i = 0; i < 24; i++) {
-                        String meow = json.getString(TAG_TITLE).toString();
-                        String[] parts = meow.split(",");
+                    for (int i = 0; i < notesToLoad; i++) {
+
+                        String ids = json.getString(TAG_ID).toString();
+                        String[] idsparts = ids.split(",");
+                        idarraylist.add(idsparts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
+
+                        String titles = json.getString(TAG_TITLE).toString();
+                        String[] parts = titles.split(",");
                         al.add(parts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 final List<String> notes_list = new ArrayList<String>(al);
-                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String> (MainActivity.this, android.R.layout.simple_list_item_1, notes_list);
+                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, notes_list);
                 lv.setAdapter(arrayAdapter);
-
 
 
             } else {

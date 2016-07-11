@@ -479,6 +479,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if (json.getInt(TAG_SUCCESS) == 1) {
                     Log.d("JSON result", json.toString());
                     new SaveSharedPreference().setUserName(LoginActivity.this, args[0]);
+                    new SaveSharedPreference().setPassword(LoginActivity.this, args[1]);
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     return true;
