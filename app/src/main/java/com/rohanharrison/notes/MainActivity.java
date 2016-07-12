@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -173,14 +174,13 @@ public class MainActivity extends AppCompatActivity {
             ArrayList al = new ArrayList();
 
 
-
             if (pDialog != null && pDialog.isShowing()) {
                 pDialog.dismiss();
             }
 
             if (json != null) {
                 //Toast.makeText(MainActivity.this, json.toString(),
-                        //Toast.LENGTH_LONG).show();
+                //Toast.LENGTH_LONG).show();
 
                 try {
                     success = json.getInt(TAG_SUCCESS);
@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 final ListView lv = (ListView) findViewById(R.id.notesList);
+                lv.setClickable(true);
 
                 int notesToLoad = 24;
 
@@ -209,6 +210,17 @@ public class MainActivity extends AppCompatActivity {
                         String[] parts = titles.split(",");
                         al.add(parts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
                     }
+
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+
+                            new loadNote().execute(idarraylist.get(position).toString(), "null");
+
+                        }
+
+                    });
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -221,6 +233,75 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Failure", message);
             }
         }
+    }
+
+    class loadNote extends AsyncTask<String, String, JSONObject> {
+
+        JSONParser jsonParser = new JSONParser();
+
+        private ProgressDialog pDialog;
+
+        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidGetNote.php";
+
+        private static final String TAG_SUCCESS = "success";
+        private static final String TAG_MESSAGE = "message";
+        private static final String TAG_ID = "id";
+        private static final String TAG_TITLE = "title";
+        private static final String TAG_BODY = "body";
+
+        @Override
+        protected void onPreExecute() {
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Fetching Data...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... args) {
+
+            try {
+
+                HashMap<String, String> params = new HashMap<>();
+                //params.put(SaveSharedPreference.getUserName(MainActivity.this), args[0]);
+                params.put("id", args[0]);
+                //params.put("title", args[1]);
+                //params.put("password", args[1]);
+
+                //  Log.d("request", "starting");
+
+                JSONObject json = jsonParser.makeHttpRequest(
+                        LOGIN_URL, "GET", params);
+
+
+                if (json != null) {
+
+
+                    String contentBody = json.getString(TAG_BODY);
+                    contentBody = contentBody.substring(2,contentBody.toString().length()-2);
+
+                    contentBody = contentBody.replace("\\n", "\n");
+
+
+
+
+
+                    Intent intent = new Intent(MainActivity.this, Body.class);
+                    intent.putExtra("contentID", args[0]);
+                    intent.putExtra("contentBody", contentBody);
+                    startActivity(intent);
+
+                    return json;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
 
     }
 }

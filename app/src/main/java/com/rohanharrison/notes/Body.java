@@ -25,6 +25,17 @@ public class Body extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_body);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String value = extras.getString("contentBody");
+            //The key argument here must match that used in the other activity
+
+            EditText mText = (EditText) findViewById(R.id.content);
+            mText.setText(value);
+
+        }
+
     }
 
     @Override
@@ -136,77 +147,6 @@ public class Body extends AppCompatActivity {
 
     }
 
-    class loadNote extends AsyncTask<String, String, JSONObject> {
 
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidGetNote.php";
-
-        private static final String TAG_SUCCESS = "success";
-        private static final String TAG_MESSAGE = "message";
-        private static final String TAG_ID = "id";
-        private static final String TAG_TITLE = "title";
-
-        @Override
-        protected void onPreExecute() {
-            pDialog = new ProgressDialog(Body.this);
-            pDialog.setMessage("Fetching Data...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
-        }
-
-        @Override
-        protected JSONObject doInBackground(String... args) {
-
-            try {
-
-                HashMap<String, String> params = new HashMap<>();
-                //params.put(SaveSharedPreference.getUserName(MainActivity.this), args[0]);
-                params.put("name", args[0]);
-                //params.put("title", args[1]);
-                //params.put("password", args[1]);
-
-                //  Log.d("request", "starting");
-
-                JSONObject json = jsonParser.makeHttpRequest(
-                        LOGIN_URL, "GET", params);
-
-
-                if (json != null) {
-                    //Log.d("JSON result", json.toString());
-
-                    return json;
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        protected void onPostExecute(JSONObject json) {
-
-            int success = 0;
-            String message = "";
-
-
-            if (pDialog != null && pDialog.isShowing()) {
-                pDialog.dismiss();
-            }
-
-            if (json != null) {
-                //Log.d("Success!", message);
-
-
-            } else {
-                Log.d("Failure", message);
-            }
-        }
-
-    }
 
 }
