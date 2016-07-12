@@ -6,3 +6,15 @@
 .DS_Store
 /build
 /captures
+
+*.log
+.navigation/
+captures/
+*.jks
+bin/
+gen/
+out/
+*.class
+*.dex
+*.apk
+*.ap_
