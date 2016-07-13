@@ -121,12 +121,15 @@ public class MainActivity extends AppCompatActivity {
 
         private ProgressDialog pDialog;
 
+        int noteCT = 0;
+
         private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidGetNoteList.php";
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
         private static final String TAG_ID = "id";
         private static final String TAG_TITLE = "title";
+        private static final String TAG_COUNT = "noteCount";
 
         @Override
         protected void onPreExecute() {
@@ -197,10 +200,15 @@ public class MainActivity extends AppCompatActivity {
                 final ListView lv = (ListView) findViewById(R.id.notesList);
                 lv.setClickable(true);
 
-                int notesToLoad = 24;
+                try {
+                    String noteCount = json.getString(TAG_COUNT).toString();
+                    noteCT = Integer.parseInt(noteCount);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 try {
-                    for (int i = 0; i < notesToLoad; i++) {
+                    for (int i = 0; i < noteCT; i++) {
 
                         String ids = json.getString(TAG_ID).toString();
                         String[] idsparts = ids.split(",");

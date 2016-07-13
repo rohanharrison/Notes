@@ -14,6 +14,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -420,6 +422,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 if (json.getInt(TAG_SUCCESS) == 1) {
                     Log.d("JSON result", json.toString());
+                    new SaveSharedPreference().clearUserName(LoginActivity.this);
                     new SaveSharedPreference().setUserName(LoginActivity.this, json.getString(TAG_USERNAME));
                     new SaveSharedPreference().setPassword(LoginActivity.this, json.getString(TAG_PASSWORD));
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -478,10 +481,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 if (json.getInt(TAG_SUCCESS) == 1) {
                     Log.d("JSON result", json.toString());
-                    new SaveSharedPreference().setUserName(LoginActivity.this, args[0]);
-                    new SaveSharedPreference().setPassword(LoginActivity.this, args[1]);
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
+
+                    final String name = args[0];
+                    final String password = args[1];
+
+                    Handler h = new Handler(Looper.getMainLooper());
+                    h.post(new Runnable() {
+                        public void run() {
+                            new userLogin().execute(name, password);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+
+
+
+
                     return true;
                 } else {
                     System.exit(0);

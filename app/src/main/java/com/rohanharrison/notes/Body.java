@@ -83,12 +83,17 @@ public class Body extends AppCompatActivity {
             String email = SaveSharedPreference.getUserName(Body.this);
 
             Bundle extras = getIntent().getExtras();
-            String postNum = extras.getString("contentID");
+            String postNum = null;
+            if (extras != null) {
+                postNum = extras.getString("contentID");
+            }
+
             if (postNum != null) {
                 mUpdateNoteTask = (updateNote) new updateNote().execute(postNum, content);
             } else {
                 mPostNoteTask = (postNote) new postNote().execute(email, content);
-            }
+
+        }
 
             //mPostNoteTask = (postNote) new postNote().execute(email, content);
         }
