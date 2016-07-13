@@ -206,7 +206,8 @@ public class MainActivity extends AppCompatActivity {
                         String[] idsparts = ids.split(",");
                         idarraylist.add(idsparts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
 
-                        String titles = json.getString(TAG_TITLE).toString();
+
+                        String titles = json.getString(TAG_TITLE);
                         String[] parts = titles.split(",");
                         al.add(parts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
                     }

@@ -20,6 +20,7 @@ import java.util.HashMap;
 public class Body extends AppCompatActivity {
 
     private postNote mPostNoteTask = null;
+    private updateNote mUpdateNoteTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +30,12 @@ public class Body extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String value = extras.getString("contentBody");
+            String id = extras.getString("contentID");
             //The key argument here must match that used in the other activity
-
-            EditText mText = (EditText) findViewById(R.id.content);
-            mText.setText(value);
+            if (id != null) {
+                EditText mText = (EditText) findViewById(R.id.content);
+                mText.setText(value);
+            }
 
         }
 
@@ -79,7 +82,15 @@ public class Body extends AppCompatActivity {
 
             String email = SaveSharedPreference.getUserName(Body.this);
 
-            mPostNoteTask = (postNote) new postNote().execute(email, content);
+            Bundle extras = getIntent().getExtras();
+            String postNum = extras.getString("contentID");
+            if (postNum != null) {
+                mUpdateNoteTask = (updateNote) new updateNote().execute(postNum, content);
+            } else {
+                mPostNoteTask = (postNote) new postNote().execute(email, content);
+            }
+
+            //mPostNoteTask = (postNote) new postNote().execute(email, content);
         }
 
         return super.onOptionsItemSelected(item);
@@ -121,6 +132,61 @@ public class Body extends AppCompatActivity {
                 } else {
                     params.put("name", "null");
                 }
+                params.put("body", args[1]);
+
+                Log.d("request", "starting");
+
+                JSONObject json = jsonParser.makeHttpRequest(
+                        LOGIN_URL, "POST", params);
+
+                if (json.getInt(TAG_SUCCESS) == 1) {
+                    Log.d("JSON result", json.toString());
+                    Intent intent = new Intent(Body.this, MainActivity.class);
+                    startActivity(intent);
+                    return true;
+                } else {
+                    System.exit(0);
+                    return false;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+    }
+
+    class updateNote extends AsyncTask<String, String, Boolean> {
+        JSONParser jsonParser = new JSONParser();
+
+        private ProgressDialog pDialog;
+
+        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidUpdateNote.php";
+
+        private static final String TAG_SUCCESS = "success";
+        private static final String TAG_MESSAGE = "message";
+
+
+        @Override
+        protected void onPreExecute() {
+            pDialog = new ProgressDialog(Body.this);
+            pDialog.setMessage("Updating Note...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... args) {
+
+            final AutoCompleteTextView loginInput = (AutoCompleteTextView) findViewById(R.id.email);
+            String message = "";
+            try {
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("postNum", args[0]);
                 params.put("body", args[1]);
 
                 Log.d("request", "starting");
