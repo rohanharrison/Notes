@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -21,6 +22,8 @@ public class Body extends AppCompatActivity {
 
     private postNote mPostNoteTask = null;
     private updateNote mUpdateNoteTask = null;
+    private deleteNote mDeleteNoteTask = null;
+    String postNum = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,33 @@ public class Body extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_delete) {
+            Bundle extras = getIntent().getExtras();
+            //String postNum = null;
+            if (extras != null) {
+                postNum = extras.getString("contentID");
+            }
+
+            if (postNum != null) {
+
+                new AlertDialog.Builder(this).setIcon(R.drawable.ic_warning_black_48dp).setTitle("Exit")
+                        .setMessage("Are you sure you want to delete this note?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String content = null;
+                                mDeleteNoteTask = (deleteNote) new deleteNote().execute(postNum, content);
+                            }
+                        }).setNegativeButton("No", null).show();
+
+
+
+            } else {
+                onBackPressed();
+            }
+
+        }
+
         if (id == R.id.action_save) {
             EditText mText = (EditText) findViewById(R.id.content);
             String content = mText.getText().toString();
@@ -83,19 +113,21 @@ public class Body extends AppCompatActivity {
             String email = SaveSharedPreference.getUserName(Body.this);
 
             Bundle extras = getIntent().getExtras();
-            String postNum = null;
+           // String postNum = null;
             if (extras != null) {
                 postNum = extras.getString("contentID");
             }
 
-            if (postNum != null) {
-                mUpdateNoteTask = (updateNote) new updateNote().execute(postNum, content);
+            if (mText.length() == 0) {
+                Toast.makeText(Body.this, "You cannot save a blank note!",
+                Toast.LENGTH_LONG).show();
             } else {
-                mPostNoteTask = (postNote) new postNote().execute(email, content);
-
-        }
-
-            //mPostNoteTask = (postNote) new postNote().execute(email, content);
+                if (postNum != null) {
+                    mUpdateNoteTask = (updateNote) new updateNote().execute(postNum, content);
+                } else {
+                    mPostNoteTask = (postNote) new postNote().execute(email, content);
+                }
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -174,6 +206,7 @@ public class Body extends AppCompatActivity {
         private static final String TAG_MESSAGE = "message";
 
 
+
         @Override
         protected void onPreExecute() {
             pDialog = new ProgressDialog(Body.this);
@@ -193,6 +226,61 @@ public class Body extends AppCompatActivity {
                 HashMap<String, String> params = new HashMap<>();
                 params.put("postNum", args[0]);
                 params.put("body", args[1]);
+
+                Log.d("request", "starting");
+
+                JSONObject json = jsonParser.makeHttpRequest(
+                        LOGIN_URL, "POST", params);
+
+                if (json.getInt(TAG_SUCCESS) == 1) {
+                    Log.d("JSON result", json.toString());
+                    Intent intent = new Intent(Body.this, MainActivity.class);
+                    startActivity(intent);
+                    return true;
+                } else {
+                    System.exit(0);
+                    return false;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+    }
+
+    class deleteNote extends AsyncTask<String, String, Boolean> {
+        JSONParser jsonParser = new JSONParser();
+
+        private ProgressDialog pDialog;
+
+        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidDeleteNote.php";
+
+        private static final String TAG_SUCCESS = "success";
+        private static final String TAG_MESSAGE = "message";
+
+
+        @Override
+        protected void onPreExecute() {
+            pDialog = new ProgressDialog(Body.this);
+            pDialog.setMessage("Deleting Note...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... args) {
+
+            final AutoCompleteTextView loginInput = (AutoCompleteTextView) findViewById(R.id.email);
+            String message = "";
+            try {
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("postNum", args[0]);
+                //params.put("body", args[1]);
 
                 Log.d("request", "starting");
 

@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+
                 try {
                     for (int i = 0; i < noteCT; i++) {
 
