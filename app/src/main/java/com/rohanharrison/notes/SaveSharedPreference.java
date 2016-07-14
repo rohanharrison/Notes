@@ -6,8 +6,7 @@ import android.preference.PreferenceManager;
 
 import org.json.JSONException;
 
-public class SaveSharedPreference
-{
+public class SaveSharedPreference {
     static final String PREF_USER_NAME = "username";
     static final String PREF_PASSWORD = "password";
     static final String PREF_BODY = "body";
@@ -29,22 +28,19 @@ public class SaveSharedPreference
     }
 
 
-    public static void clearUserName(Context ctx)
-    {
+    public static void clearUserName(Context ctx) {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.clear();
         editor.commit();
     }
 
 
-    public static String getUserName(Context ctx)
-    {
+    public static String getUserName(Context ctx) {
         return getSharedPreferences(ctx).getString(PREF_USER_NAME, "");
     }
 
 
-    public static String getPassword(Context ctx)
-    {
+    public static String getPassword(Context ctx) {
         return getSharedPreferences(ctx).getString(PREF_PASSWORD, "");
     }
 }

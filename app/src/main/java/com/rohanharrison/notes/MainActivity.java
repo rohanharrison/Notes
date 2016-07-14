@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout mSwipeRefreshLayout = null;
     ArrayList idarraylist = new ArrayList();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,17 +69,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    /*private void updateList() {
-        Intent intent = new Intent(MainActivity.this, MainActivity.class);
-        startActivity(intent);
-
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-    }*/
-
-
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -94,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -102,9 +93,9 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        // if (id == R.id.action_settings) {
 
-        }
+        //}
         if (id == R.id.action_signout) {
             SaveSharedPreference.clearUserName(MainActivity.this);
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -113,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 
     class getNotes extends AsyncTask<String, String, JSONObject> {
 
@@ -217,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                         String titles = json.getString(TAG_TITLE);
+                        titles = titles.replace("\\n", "\n");
                         String[] parts = titles.split(",");
                         al.add(parts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
                     }
@@ -289,12 +280,9 @@ public class MainActivity extends AppCompatActivity {
 
 
                     String contentBody = json.getString(TAG_BODY);
-                    contentBody = contentBody.substring(2,contentBody.toString().length()-2);
+                    contentBody = contentBody.substring(2, contentBody.toString().length() - 2);
 
                     contentBody = contentBody.replace("\\n", "\n");
-
-
-
 
 
                     Intent intent = new Intent(MainActivity.this, Body.class);

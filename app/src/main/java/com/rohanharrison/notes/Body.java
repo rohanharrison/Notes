@@ -98,7 +98,6 @@ public class Body extends AppCompatActivity {
                         }).setNegativeButton("No", null).show();
 
 
-
             } else {
                 onBackPressed();
             }
@@ -113,14 +112,14 @@ public class Body extends AppCompatActivity {
             String email = SaveSharedPreference.getUserName(Body.this);
 
             Bundle extras = getIntent().getExtras();
-           // String postNum = null;
+            // String postNum = null;
             if (extras != null) {
                 postNum = extras.getString("contentID");
             }
 
             if (mText.length() == 0) {
                 Toast.makeText(Body.this, "You cannot save a blank note!",
-                Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_LONG).show();
             } else {
                 if (postNum != null) {
                     mUpdateNoteTask = (updateNote) new updateNote().execute(postNum, content);
@@ -204,7 +203,6 @@ public class Body extends AppCompatActivity {
 
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
-
 
 
         @Override
@@ -305,7 +303,6 @@ public class Body extends AppCompatActivity {
         }
 
     }
-
 
 
 }

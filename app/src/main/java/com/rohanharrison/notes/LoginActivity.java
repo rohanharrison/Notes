@@ -31,6 +31,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -65,9 +66,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    String errorToast = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            errorToast = extras.getString("errorToast");
+        }
+
+        if (errorToast != null) {
+            Toast.makeText(LoginActivity.this, errorToast,
+                    Toast.LENGTH_LONG).show();
+        }
 
         int userLength = SaveSharedPreference.getUserName(LoginActivity.this).length();
 
@@ -429,7 +441,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     startActivity(intent);
                     return true;
                 } else {
-                    System.exit(0);
+                    new SaveSharedPreference().clearUserName(LoginActivity.this);
+                    Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+                    intent.putExtra("errorToast", "Invalid username or password.");
+                    startActivity(intent);
                     return false;
                 }
 
@@ -493,13 +508,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             startActivity(intent);
                         }
                     });
-
-
-
-
                     return true;
                 } else {
-                    System.exit(0);
+                    new SaveSharedPreference().clearUserName(LoginActivity.this);
+                    Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+                    intent.putExtra("errorToast", "This username is not available.");
+                    startActivity(intent);
                     return false;
                 }
 
