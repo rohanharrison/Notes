@@ -43,30 +43,24 @@ import java.util.regex.Pattern;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-/**
- * A login screen that offers login via email/password.
- */
+
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-
-
+    String errorToast = null;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     // private UserLoginTask mAuthTask = null;
     private userLogin mAuthTask = null;
-    private userSignUp mAuthTaskSignUp = null;
-
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    String errorToast = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -289,7 +283,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             showProgress(true);
             //mAuthTask = new UserLoginTask(email, password);
-            mAuthTaskSignUp = (userSignUp) new userSignUp().execute(email, password);
+            userSignUp mAuthTaskSignUp = (userSignUp) new userSignUp().execute(email, password);
             //mAuthTask.execute((Void) null);
         }
     }
@@ -299,10 +293,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Matcher m = p.matcher(email);
         boolean b = m.find();
 
-        if (!b) {
-            return email.length() > 3;
-        }
-        return false;
+        return !b && email.length() > 3;
     }
 
     private boolean isPasswordValid(String password) {
@@ -401,17 +392,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     class userLogin extends AsyncTask<String, String, Boolean> {
 
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidLogin.php";
-
+        private static final String LOGIN_URL = "http://107.170.28.29/notes/android/androidLogin.php";
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
         private static final String TAG_USERNAME = "name";
         private static final String TAG_PASSWORD = "password";
-
+        JSONParser jsonParser = new JSONParser();
+        private ProgressDialog pDialog;
 
         @Override
         protected void onPreExecute() {
@@ -466,16 +453,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     class userSignUp extends AsyncTask<String, String, Boolean> {
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidSignUp.php";
-
+        private static final String LOGIN_URL = "http://107.170.28.29/notes/android/androidSignUp.php";
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
         private static final String TAG_USERNAME = "name";
-
+        JSONParser jsonParser = new JSONParser();
+        private ProgressDialog pDialog;
 
         @Override
         protected void onPreExecute() {

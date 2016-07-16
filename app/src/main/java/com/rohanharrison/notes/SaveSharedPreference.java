@@ -9,7 +9,6 @@ import org.json.JSONException;
 public class SaveSharedPreference {
     static final String PREF_USER_NAME = "username";
     static final String PREF_PASSWORD = "password";
-    static final String PREF_BODY = "body";
 
     static SharedPreferences getSharedPreferences(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -17,7 +16,7 @@ public class SaveSharedPreference {
 
     public static void setUserName(Context ctx, String userName) throws JSONException {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
-        editor.putString(PREF_USER_NAME, userName.toString());
+        editor.putString(PREF_USER_NAME, userName);
         editor.commit();
     }
 

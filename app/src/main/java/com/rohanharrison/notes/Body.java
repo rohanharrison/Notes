@@ -20,10 +20,8 @@ import java.util.HashMap;
 
 public class Body extends AppCompatActivity {
 
-    private postNote mPostNoteTask = null;
-    private updateNote mUpdateNoteTask = null;
-    private deleteNote mDeleteNoteTask = null;
     String postNum = null;
+    private deleteNote mDeleteNoteTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +32,7 @@ public class Body extends AppCompatActivity {
         if (extras != null) {
             String value = extras.getString("contentBody");
             String id = extras.getString("contentID");
-            //The key argument here must match that used in the other activity
+
             if (id != null) {
                 EditText mText = (EditText) findViewById(R.id.content);
                 mText.setText(value);
@@ -60,18 +58,14 @@ public class Body extends AppCompatActivity {
                         }
                     }).setNegativeButton("No", null).show();
         } else {
-            //onBackPressed();
             super.onBackPressed();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_body, menu);
         return true;
-
-
     }
 
     @Override
@@ -80,7 +74,7 @@ public class Body extends AppCompatActivity {
 
         if (id == R.id.action_delete) {
             Bundle extras = getIntent().getExtras();
-            //String postNum = null;
+
             if (extras != null) {
                 postNum = extras.getString("contentID");
             }
@@ -93,7 +87,7 @@ public class Body extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String content = null;
-                                mDeleteNoteTask = (deleteNote) new deleteNote().execute(postNum, content);
+                                mDeleteNoteTask = (deleteNote) new deleteNote().execute(postNum, null);
                             }
                         }).setNegativeButton("No", null).show();
 
@@ -112,7 +106,6 @@ public class Body extends AppCompatActivity {
             String email = SaveSharedPreference.getUserName(Body.this);
 
             Bundle extras = getIntent().getExtras();
-            // String postNum = null;
             if (extras != null) {
                 postNum = extras.getString("contentID");
             }
@@ -122,9 +115,9 @@ public class Body extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
             } else {
                 if (postNum != null) {
-                    mUpdateNoteTask = (updateNote) new updateNote().execute(postNum, content);
+                    updateNote mUpdateNoteTask = (updateNote) new updateNote().execute(postNum, content);
                 } else {
-                    mPostNoteTask = (postNote) new postNote().execute(email, content);
+                    postNote mPostNoteTask = (postNote) new postNote().execute(email, content);
                 }
             }
         }
@@ -133,15 +126,11 @@ public class Body extends AppCompatActivity {
     }
 
     class postNote extends AsyncTask<String, String, Boolean> {
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidPostNote.php";
-
+        private static final String LOGIN_URL = "http://107.170.28.29/notes/android/androidPostNote.php";
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
-
+        JSONParser jsonParser = new JSONParser();
+        private ProgressDialog pDialog;
 
         @Override
         protected void onPreExecute() {
@@ -155,14 +144,13 @@ public class Body extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(String... args) {
 
-            //String name = SaveSharedPreference.getUserName(Body.this);
 
             final AutoCompleteTextView loginInput = (AutoCompleteTextView) findViewById(R.id.email);
             String message = "";
             try {
 
                 HashMap<String, String> params = new HashMap<>();
-                //params.put(name, args[0]);
+
                 if (args[0].length() > 0) {
                     params.put("name", args[0]);
                 } else {
@@ -195,15 +183,11 @@ public class Body extends AppCompatActivity {
     }
 
     class updateNote extends AsyncTask<String, String, Boolean> {
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidUpdateNote.php";
-
+        private static final String LOGIN_URL = "http://107.170.28.29/notes/android/androidUpdateNote.php";
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
-
+        JSONParser jsonParser = new JSONParser();
+        private ProgressDialog pDialog;
 
         @Override
         protected void onPreExecute() {
@@ -250,15 +234,11 @@ public class Body extends AppCompatActivity {
     }
 
     class deleteNote extends AsyncTask<String, String, Boolean> {
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidDeleteNote.php";
-
+        private static final String LOGIN_URL = "http://107.170.28.29/notes/android/androidDeleteNote.php";
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
-
+        JSONParser jsonParser = new JSONParser();
+        private ProgressDialog pDialog;
 
         @Override
         protected void onPreExecute() {
@@ -278,7 +258,7 @@ public class Body extends AppCompatActivity {
 
                 HashMap<String, String> params = new HashMap<>();
                 params.put("postNum", args[0]);
-                //params.put("body", args[1]);
+
 
                 Log.d("request", "starting");
 

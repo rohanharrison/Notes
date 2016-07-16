@@ -24,11 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private getNotes mAuthTaskgetNotes = null;
     ListView mListView;
-    private SwipeRefreshLayout mSwipeRefreshLayout = null;
     ArrayList idarraylist = new ArrayList();
-
+    private getNotes mAuthTaskgetNotes = null;
+    private SwipeRefreshLayout mSwipeRefreshLayout = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -87,15 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        // if (id == R.id.action_settings) {
-
-        //}
         if (id == R.id.action_signout) {
             SaveSharedPreference.clearUserName(MainActivity.this);
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -107,19 +98,15 @@ public class MainActivity extends AppCompatActivity {
 
     class getNotes extends AsyncTask<String, String, JSONObject> {
 
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        int noteCT = 0;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidGetNoteList.php";
-
+        private static final String LOGIN_URL = "http://107.170.28.29/notes/android/androidGetNoteList.php";
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
         private static final String TAG_ID = "id";
         private static final String TAG_TITLE = "title";
         private static final String TAG_COUNT = "noteCount";
+        JSONParser jsonParser = new JSONParser();
+        int noteCT = 0;
+        private ProgressDialog pDialog;
 
         @Override
         protected void onPreExecute() {
@@ -136,19 +123,13 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 HashMap<String, String> params = new HashMap<>();
-                //params.put(SaveSharedPreference.getUserName(MainActivity.this), args[0]);
                 params.put("name", args[0]);
-                //params.put("title", args[1]);
-                //params.put("password", args[1]);
-
-                //  Log.d("request", "starting");
 
                 JSONObject json = jsonParser.makeHttpRequest(
                         LOGIN_URL, "GET", params);
 
 
                 if (json != null) {
-                    //Log.d("JSON result", json.toString());
 
                     return json;
                 }
@@ -172,8 +153,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (json != null) {
-                //Toast.makeText(MainActivity.this, json.toString(),
-                //Toast.LENGTH_LONG).show();
 
                 try {
                     success = json.getInt(TAG_SUCCESS);
@@ -184,14 +163,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (json != null) {
-                //Log.d("Success!", message);
-
 
                 final ListView lv = (ListView) findViewById(R.id.notesList);
                 lv.setClickable(true);
 
                 try {
-                    String noteCount = json.getString(TAG_COUNT).toString();
+                    String noteCount = json.getString(TAG_COUNT);
                     noteCT = Integer.parseInt(noteCount);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -201,15 +178,15 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     for (int i = 0; i < noteCT; i++) {
 
-                        String ids = json.getString(TAG_ID).toString();
+                        String ids = json.getString(TAG_ID);
                         String[] idsparts = ids.split(",");
-                        idarraylist.add(idsparts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
+                        idarraylist.add(idsparts[i].replaceAll("[^a-zA-Z0-9]", ""));
 
 
                         String titles = json.getString(TAG_TITLE);
                         titles = titles.replace("\\n", "\n");
                         String[] parts = titles.split(",");
-                        al.add(parts[i].toString().replaceAll("[^a-zA-Z0-9]", ""));
+                        al.add(parts[i].replaceAll("[^a-zA-Z0-9]", ""));
                     }
 
                     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -238,17 +215,14 @@ public class MainActivity extends AppCompatActivity {
 
     class loadNote extends AsyncTask<String, String, JSONObject> {
 
-        JSONParser jsonParser = new JSONParser();
-
-        private ProgressDialog pDialog;
-
-        private static final String LOGIN_URL = "http://rohanharrison.com/notes/android/androidGetNote.php";
-
+        private static final String LOGIN_URL = "http://107.170.28.29/notes/android/androidGetNote.php";
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
         private static final String TAG_ID = "id";
         private static final String TAG_TITLE = "title";
         private static final String TAG_BODY = "body";
+        JSONParser jsonParser = new JSONParser();
+        private ProgressDialog pDialog;
 
         @Override
         protected void onPreExecute() {
@@ -265,12 +239,8 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 HashMap<String, String> params = new HashMap<>();
-                //params.put(SaveSharedPreference.getUserName(MainActivity.this), args[0]);
                 params.put("id", args[0]);
-                //params.put("title", args[1]);
-                //params.put("password", args[1]);
 
-                //  Log.d("request", "starting");
 
                 JSONObject json = jsonParser.makeHttpRequest(
                         LOGIN_URL, "GET", params);
@@ -280,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     String contentBody = json.getString(TAG_BODY);
-                    contentBody = contentBody.substring(2, contentBody.toString().length() - 2);
+                    contentBody = contentBody.substring(2, contentBody.length() - 2);
 
                     contentBody = contentBody.replace("\\n", "\n");
 
